@@ -1,6 +1,8 @@
 #include "/usr/local/Cellar/raylib/5.0/include/raylib.h"
 #include <cmath>
+#include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #define SCR_W 800
@@ -9,8 +11,6 @@
 class snake {
 public:
   int index;
-  int width = 25;
-  int height = 25;
   snake(int in) { index = in; }
 };
 
@@ -38,21 +38,27 @@ void checkKeys(int *k, int *xspd, int *yspd) {
   }
 }
 
-void spawnSnake(std::vector<int> *xList, std::vector<int> *yList,
-                std::vector<snake> *snkList, int s) {
-  snake snk(snkList->size() - 1);
+void spawnSnake(std::map<int, int *> *mp) {
+  snake snk(mp->size() - 1);
 
-  int newX = (*xList)[snk.index - 1];
-  xList->push_back(newX);
+  int newX = (*mp)[snk.index - 1][0];
+  int newY = (*mp)[snk.index - 1][1];
 
-  int newY = (*yList)[snk.index - 1];
-  yList->push_back(newY);
+  int *newArr = new int[2];
+  newArr[0] = newX;
+  newArr[1] = newY;
 
-  snkList->push_back(snk);
+  std::pair<int, int *> pair = std::make_pair(snk.index, newArr);
+  mp->insert(pair);
+
+  delete[] newArr;
 }
 
 int main() {
   InitWindow(SCR_W, SCR_H, "testWindow");
+
+  std::map<int, int *> m;
+
   std::vector<int> sX = {200};
   std::vector<int> sY = {250};
   snake headSnake(0);
@@ -77,24 +83,18 @@ int main() {
       DrawText(fps.c_str(), 0, 0, 20, Color(WHITE));
 
       while (size != snakeList.size()) {
-        spawnSnake(&sX, &sY, &snakeList, size);
+        spawnSnake(&m);
       }
-
+      // loop to update position values
       for (int i = snakeList.size() - 1; i > 1; i--) {
         snake *obj = &snakeList[i];
-
-        sX[obj->index] = sX[obj->index - 1];
-        sY[obj->index] = sY[obj->index - 1];
       }
 
+      // need to add headSnake spawn
       checkKeys(&lastKey, &xspd, &yspd);
-
-      sX[0] += xspd;
-      sY[0] += yspd;
+      // loop to draw snakes
       for (int i = 0; i < snakeList.size(); i++) {
         snake *obj = &snakeList[i];
-        DrawRectangle(sX[obj->index], sY[obj->index], obj->width, obj->height,
-                      Color(WHITE));
       }
 
       EndDrawing();
