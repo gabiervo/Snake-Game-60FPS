@@ -31,13 +31,25 @@ void checkKeys(int *k, int *xspd, int *yspd) {
   }
 }
 
+void checkCollision(std::map<int, int *> *mp, int x, int y) {
+  std::map<int, int *>::iterator it;
+  for (it = mp->begin(); it != mp->end(); ++it) {
+    if ((it->second)[0] == x && (it->second)[1] == y) {
+      CloseWindow();
+    }
+  }
+}
+
 void snakeQueue(std::map<int, int *> *mp, int spdx, int spdy, int count,
-                int size) {
+                int size, bool hasGrown) {
   int oldX = (*mp)[count - 1][0] + spdx;
   int oldY = (*mp)[count - 1][1] + spdy;
+  checkCollision(&*mp, oldX, oldY);
   int *arr = new int[2]{oldX, oldY};
   (*mp)[count] = arr;
-  mp->erase(count - size);
+  if (!hasGrown) {
+    mp->erase(count - size);
+  }
 }
 
 int main() {
@@ -46,14 +58,14 @@ int main() {
   std::map<int, int *> m;
   m[0] = new int[2]{250, 20};
 
-  int size = 1;
+  int size = 20;
   int count = 1;
 
   int lastKey;
   int xspd = 0;
   int yspd = 25;
 
-  SetTargetFPS(15);
+  SetTargetFPS(10);
   if (IsWindowReady()) {
 
     while (!WindowShouldClose()) {
@@ -66,7 +78,7 @@ int main() {
       DrawText(fps.c_str(), 0, 0, 20, Color(WHITE));
 
       checkKeys(&lastKey, &xspd, &yspd);
-      snakeQueue(&m, xspd, yspd, count, size);
+      snakeQueue(&m, xspd, yspd, count, size, (size != m.size()));
       count++;
       // loop to draw snakes
       std::map<int, int *>::iterator it;
