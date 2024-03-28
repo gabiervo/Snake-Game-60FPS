@@ -3,16 +3,9 @@
 #include <map>
 #include <string>
 #include <utility>
-#include <vector>
 
 #define SCR_W 800
 #define SCR_H 500
-
-class snake {
-public:
-  int index;
-  snake(int in) { index = in; }
-};
 
 void checkKeys(int *k, int *xspd, int *yspd) {
   int key = -1;
@@ -38,37 +31,29 @@ void checkKeys(int *k, int *xspd, int *yspd) {
   }
 }
 
-void spawnSnake(std::map<int, int *> *mp) {
-  snake snk(mp->size() - 1);
-
-  int newX = (*mp)[snk.index - 1][0];
-  int newY = (*mp)[snk.index - 1][1];
-
-  int *newArr = new int[2];
-  newArr[0] = newX;
-  newArr[1] = newY;
-
-  std::pair<int, int *> pair = std::make_pair(snk.index, newArr);
-  mp->insert(pair);
-
-  delete[] newArr;
+void snakeQueue(std::map<int, int *> *mp, int spdx, int spdy, int count,
+                int size) {
+  int oldX = (*mp)[count - 1][0] + spdx;
+  int oldY = (*mp)[count - 1][1] + spdy;
+  int *arr = new int[2]{oldX, oldY};
+  (*mp)[count] = arr;
+  mp->erase(count - size);
 }
 
 int main() {
   InitWindow(SCR_W, SCR_H, "testWindow");
 
   std::map<int, int *> m;
+  m[0] = new int[2]{250, 20};
 
-  snake headSnake(0);
-  std::vector<snake> snakeList = {headSnake};
-
-  int size = 10;
+  int size = 1;
+  int count = 1;
 
   int lastKey;
   int xspd = 0;
-  int yspd = -25;
+  int yspd = 25;
 
-  SetTargetFPS(30);
+  SetTargetFPS(15);
   if (IsWindowReady()) {
 
     while (!WindowShouldClose()) {
@@ -80,24 +65,16 @@ int main() {
           std::to_string(std::round((1000 / GetFrameTime() / 1000)));
       DrawText(fps.c_str(), 0, 0, 20, Color(WHITE));
 
-      while (size != snakeList.size()) {
-        // spawnSnake(&m);
-      }
-      // loop to update position values
-      for (int i = snakeList.size() - 1; i > 1; i--) {
-        snake *obj = &snakeList[i];
-        // m[obj->index][1] = m[obj->index - 1][0];
-        // m[obj->index][1] = m[obj->index - 1][1];
-      }
-
-      // need to add headSnake spawn
       checkKeys(&lastKey, &xspd, &yspd);
+      snakeQueue(&m, xspd, yspd, count, size);
+      count++;
       // loop to draw snakes
-      for (int i = 0; i < snakeList.size(); i++) {
-        snake *obj = &snakeList[i];
-        DrawRectangle(m[obj->index][0], m[obj->index][1], 25, 25, Color(WHITE));
-      }
+      std::map<int, int *>::iterator it;
+      it = m.begin();
 
+      for (it = it++; it != m.end(); ++it) {
+        DrawRectangle((it->second)[0], (it->second)[1], 25, 25, Color(WHITE));
+      }
       EndDrawing();
     }
   }
