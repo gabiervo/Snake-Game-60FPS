@@ -31,11 +31,13 @@ void checkKeys(int *k, int *xspd, int *yspd) {
   }
 }
 
+bool shouldPlay = true;
+
 void checkCollision(std::map<int, int *> *mp, int x, int y) {
   std::map<int, int *>::iterator it;
   for (it = mp->begin(); it != mp->end(); ++it) {
     if ((it->second)[0] == x && (it->second)[1] == y) {
-      CloseWindow();
+      shouldPlay = false;
     }
   }
 }
@@ -62,7 +64,7 @@ int main() {
   int size = 20;
   int count = 1;
 
-  int lastKey;
+  int lastKey = KEY_DOWN;
   int xspd = 0;
   int yspd = 25;
 
@@ -87,7 +89,7 @@ int main() {
 
       checkKeys(&lastKey, &xspd, &yspd);
 
-      if (timeCount >= 6) {
+      if (timeCount >= 6 && shouldPlay == true) {
         arr = snakeQueue(&m, xspd, yspd, count, size, (size != m.size()));
         count++;
         timeCount = 0;
