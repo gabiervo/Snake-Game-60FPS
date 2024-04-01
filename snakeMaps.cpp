@@ -82,7 +82,9 @@ int *snakeQueue(std::map<int, int *> *mp, int spdx, int spdy, int count,
 }
 
 int drawAnimations(std::vector<int> inputBuf, int x, int y, int frame, int xspd,
-                   int yspd) {
+                   int yspd, std::map<int, int *> mp, int count, int size,
+                   bool hasGrown) {
+  // front animations
   if (inputBuf.size() > 0) {
     int in = inputBuf[0];
     switch (in) {
@@ -99,28 +101,28 @@ int drawAnimations(std::vector<int> inputBuf, int x, int y, int frame, int xspd,
       DrawRectangle(x - (frame * 4), y, 20, 20, Color(WHITE));
       break;
     }
-    return 0;
+    return 2;
   } else {
     int valX = 0;
     int valY = 0;
     if (xspd != 0) {
-      valX = (((frame == 1) * 4) + ((frame == 2) * 8) + ((frame == 3) * 12) +
-              ((frame == 4) * 16));
+      valX = frame * 4;
       if (xspd < 0) {
         valX -= valX * 2;
       }
-    }
-    if (yspd != 0) {
-      int valY = (((frame == 1) * 4) + ((frame == 2) * 8) +
-                  ((frame == 3) * 12) + ((frame == 4) * 16));
+      DrawRectangle(x + valX, y, 20, 20, Color(WHITE));
+      return 0;
+    } else {
+      int valY = frame * 4;
       if (yspd < 0) {
         valY -= valY * 2;
       }
+      DrawRectangle(x, y + valY, 20, 20, Color(WHITE));
+      return 1;
     }
-
-    DrawRectangle(x + valX, y - valY, 20, 20, Color(BLUE));
-    return 1;
   }
+
+  // back animations
 }
 
 int main() {
@@ -165,9 +167,9 @@ int main() {
         arr = snakeQueue(&m, xspd, yspd, count, size, (size != m.size()));
         count++;
         timeCount = 0;
-      } else if (shouldPlay) {
-        hasBuf =
-            drawAnimations(inputBuffer, arr[0], arr[1], timeCount, xspd, yspd);
+      } else {
+        hasBuf = drawAnimations(inputBuffer, arr[0], arr[1], timeCount, xspd,
+                                yspd, m, count, size, (size != m.size()));
       }
       DrawText(std::to_string(hasBuf).c_str(), 400, 0, 20, Color(WHITE));
       // loop to draw snakes
