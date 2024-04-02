@@ -84,6 +84,8 @@ int *snakeQueue(std::map<int, int *> *mp, int spdx, int spdy, int count,
 int drawAnimations(std::vector<int> inputBuf, int x, int y, int frame, int xspd,
                    int yspd, std::map<int, int *> mp, int count, int size,
                    bool hasGrown) {
+
+  int val = -1;
   // front animations
   if (inputBuf.size() > 0) {
     int in = inputBuf[0];
@@ -101,7 +103,7 @@ int drawAnimations(std::vector<int> inputBuf, int x, int y, int frame, int xspd,
       DrawRectangle(x - (frame * 4), y, 20, 20, Color(WHITE));
       break;
     }
-    return 2;
+    val = 2;
   } else {
     int valX = 0;
     int valY = 0;
@@ -111,18 +113,19 @@ int drawAnimations(std::vector<int> inputBuf, int x, int y, int frame, int xspd,
         valX -= valX * 2;
       }
       DrawRectangle(x + valX, y, 20, 20, Color(WHITE));
-      return 0;
+      val = 0;
     } else {
       int valY = frame * 4;
       if (yspd < 0) {
         valY -= valY * 2;
       }
       DrawRectangle(x, y + valY, 20, 20, Color(WHITE));
-      return 1;
+      val = 1;
     }
   }
 
   // back animations
+  return val;
 }
 
 int main() {
