@@ -125,6 +125,12 @@ int drawAnimations(std::vector<int> inputBuf, int x, int y, int frame, int xspd,
   }
 
   // back animations
+  std::pair<int, int> posPairTail;
+  std::pair<int, int> posAftTail;
+
+  std::map<int, int *>::iterator it = mp.begin();
+  posPairTail = std::make_pair(it->second[0], it->second[1]);
+
   return val;
 }
 
@@ -148,6 +154,8 @@ int main() {
   std::vector<int> inputBuffer;
   inputBuffer.push_back(KEY_DOWN);
   int hasBuf;
+
+  std::pair<int, int> secondToLastCoords = std::make_pair(m[0][0], m[0][1]);
 
   SetTargetFPS(60);
   if (IsWindowReady()) {
@@ -178,8 +186,13 @@ int main() {
       // loop to draw snakes
       std::map<int, int *>::iterator it;
       it = m.begin();
+      int countDrawnFrames = 0;
 
       for (it = it++; it != m.end(); ++it) {
+        countDrawnFrames++;
+        if (countDrawnFrames == 2) {
+          secondToLastCoords = std::make_pair(it->second[0], it->second[1]);
+        }
         DrawRectangle((it->second)[0], (it->second)[1], 20, 20, Color(WHITE));
       }
       EndDrawing();
