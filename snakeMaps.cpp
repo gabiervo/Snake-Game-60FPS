@@ -81,26 +81,27 @@ int *snakeQueue(std::map<int, int *> *mp, int spdx, int spdy, int count,
   return new int[2]{oldX, oldY};
 }
 
-int drawAnimations(std::vector<int> inputBuf, int x, int y, int frame, int xspd,
-                   int yspd, std::map<int, int *> mp, int count, int size,
-                   bool hasGrown) {
+int drawFrontAnimations(std::vector<int> inputBuf, int x, int y, int frame,
+                        int xspd, int yspd, std::map<int, int *> mp, int count,
+                        int size, bool hasGrown) {
 
   int val = -1;
+  auto color = Color(BLUE);
   // front animations
   if (inputBuf.size() > 0) {
     int in = inputBuf[0];
     switch (in) {
     case KEY_DOWN:
-      DrawRectangle(x, y + (frame * 4), 20, 20, Color(WHITE));
+      DrawRectangle(x, y + (frame * 4), 20, 20, color);
       break;
     case KEY_UP:
-      DrawRectangle(x, y - (frame * 4), 20, 20, Color(WHITE));
+      DrawRectangle(x, y - (frame * 4), 20, 20, color);
       break;
     case KEY_RIGHT:
-      DrawRectangle(x + (frame * 4), y, 20, 20, Color(WHITE));
+      DrawRectangle(x + (frame * 4), y, 20, 20, color);
       break;
     case KEY_LEFT:
-      DrawRectangle(x - (frame * 4), y, 20, 20, Color(WHITE));
+      DrawRectangle(x - (frame * 4), y, 20, 20, color);
       break;
     }
     val = 2;
@@ -112,26 +113,32 @@ int drawAnimations(std::vector<int> inputBuf, int x, int y, int frame, int xspd,
       if (xspd < 0) {
         valX -= valX * 2;
       }
-      DrawRectangle(x + valX, y, 20, 20, Color(WHITE));
+      DrawRectangle(x + valX, y, 20, 20, color);
       val = 0;
     } else {
       int valY = frame * 4;
       if (yspd < 0) {
         valY -= valY * 2;
       }
-      DrawRectangle(x, y + valY, 20, 20, Color(WHITE));
+      DrawRectangle(x, y + valY, 20, 20, color);
       val = 1;
     }
   }
 
-  // back animations
-  std::pair<int, int> posPairTail;
-  std::pair<int, int> posAftTail;
-
-  std::map<int, int *>::iterator it = mp.begin();
-  posPairTail = std::make_pair(it->second[0], it->second[1]);
-
   return val;
+}
+
+void drawBackAnimations(int *secondToLastPos, int *lastCoords, int frame) {
+  // back animations
+  int moveXval = lastCoords[0];
+  int add = frame * 4;
+
+  DrawText(std::to_string(lastCoords[0]).c_str(), 0, 18, 16, Color(WHITE));
+  DrawText(std::to_string(secondToLastPos[0]).c_str(), 0, 36, 16, Color(WHITE));
+  DrawText(std::to_string(lastCoords[0] - secondToLastPos[0]).c_str(), 0, 54,
+           16, Color(WHITE));
+
+  DrawRectangle(moveXval, lastCoords[1], 20, 20, Color(BLUE));
 }
 
 int main() {
@@ -155,7 +162,7 @@ int main() {
   inputBuffer.push_back(KEY_DOWN);
   int hasBuf;
 
-  std::pair<int, int> secondToLastCoords = std::make_pair(m[0][0], m[0][1]);
+  int *secondToLastCoords = new int[2]{m[0][0], m[0][1]};
 
   SetTargetFPS(60);
   if (IsWindowReady()) {
@@ -179,8 +186,10 @@ int main() {
         count++;
         timeCount = 0;
       } else {
-        hasBuf = drawAnimations(inputBuffer, arr[0], arr[1], timeCount, xspd,
+        hasBuf =
+            drawFrontAnimations(inputBuffer, arr[0], arr[1], timeCount, xspd,
                                 yspd, m, count, size, (size != m.size()));
+        drawBackAnimations(secondToLastCoords, m.begin()->second, timeCount);
       }
       DrawText(std::to_string(hasBuf).c_str(), 400, 0, 20, Color(WHITE));
       // loop to draw snakes
@@ -188,10 +197,11 @@ int main() {
       it = m.begin();
       int countDrawnFrames = 0;
 
-      for (it = it++; it != m.end(); ++it) {
+      for (it = it; it != m.end(); ++it) {
         countDrawnFrames++;
         if (countDrawnFrames == 2) {
-          secondToLastCoords = std::make_pair(it->second[0], it->second[1]);
+          secondToLastCoords[0] = it->second[0];
+          secondToLastCoords[1] = it->second[1];
         }
         DrawRectangle((it->second)[0], (it->second)[1], 20, 20, Color(WHITE));
       }
