@@ -86,7 +86,7 @@ int drawFrontAnimations(std::vector<int> inputBuf, int x, int y, int frame,
                         int size, bool hasGrown) {
 
   int val = -1;
-  auto color = Color(BLUE);
+  auto color = Color(WHITE);
   // front animations
   if (inputBuf.size() > 0) {
     int in = inputBuf[0];
@@ -132,13 +132,30 @@ void drawBackAnimations(int *secondToLastPos, int *lastCoords, int frame) {
   // back animations
   int moveXval = lastCoords[0];
   int add = frame * 4;
+  int diffValX = lastCoords[0] - secondToLastPos[0];
+  int diffValY = lastCoords[1] - secondToLastPos[1];
+
+  int moveYval = lastCoords[1];
 
   DrawText(std::to_string(lastCoords[0]).c_str(), 0, 18, 16, Color(WHITE));
   DrawText(std::to_string(secondToLastPos[0]).c_str(), 0, 36, 16, Color(WHITE));
-  DrawText(std::to_string(lastCoords[0] - secondToLastPos[0]).c_str(), 0, 54,
-           16, Color(WHITE));
+  DrawText(std::to_string(diffValX).c_str(), 0, 54, 16, Color(WHITE));
 
-  DrawRectangle(moveXval, lastCoords[1], 20, 20, Color(BLUE));
+  if (diffValX < 0) {
+    moveXval += frame * 4;
+  }
+  if (diffValX > 0) {
+    moveXval -= frame * 4;
+  }
+
+  if (diffValY < 0) {
+    moveYval += frame * 4;
+  }
+  if (diffValY > 0) {
+    moveYval -= frame * 4;
+  }
+  DrawText(std::to_string(moveXval).c_str(), 0, 70, 16, Color(WHITE));
+  DrawRectangle(moveXval, moveYval, 20, 20, Color(WHITE));
 }
 
 int main() {
@@ -189,17 +206,17 @@ int main() {
         hasBuf =
             drawFrontAnimations(inputBuffer, arr[0], arr[1], timeCount, xspd,
                                 yspd, m, count, size, (size != m.size()));
-        drawBackAnimations(secondToLastCoords, m.begin()->second, timeCount);
       }
+      drawBackAnimations(secondToLastCoords, m.begin()->second, timeCount);
       DrawText(std::to_string(hasBuf).c_str(), 400, 0, 20, Color(WHITE));
       // loop to draw snakes
       std::map<int, int *>::iterator it;
       it = m.begin();
       int countDrawnFrames = 0;
 
-      for (it = it; it != m.end(); ++it) {
+      for (it = ++it; it != m.end(); ++it) {
         countDrawnFrames++;
-        if (countDrawnFrames == 2) {
+        if (countDrawnFrames == 1) {
           secondToLastCoords[0] = it->second[0];
           secondToLastCoords[1] = it->second[1];
         }
