@@ -164,7 +164,7 @@ int main() {
   std::map<int, int *> m;
   m[0] = new int[2]{250, 250};
 
-  int size = 3;
+  int size = 4;
   int count = 1;
 
   int lastKey = KEY_DOWN;
