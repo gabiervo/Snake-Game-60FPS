@@ -82,8 +82,7 @@ int *snakeQueue(std::map<int, int *> *mp, int spdx, int spdy, int count,
 }
 
 int drawFrontAnimations(std::vector<int> inputBuf, int x, int y, int frame,
-                        int xspd, int yspd, std::map<int, int *> mp, int count,
-                        int size, bool hasGrown) {
+                        int xspd, int yspd, std::map<int, int *> mp) {
 
   int val = -1;
   auto color = Color(WHITE);
@@ -128,7 +127,8 @@ int drawFrontAnimations(std::vector<int> inputBuf, int x, int y, int frame,
   return val;
 }
 
-void drawBackAnimations(int *secondToLastPos, int *lastCoords, int frame) {
+void drawBackAnimations(int *secondToLastPos, int *lastCoords, int frame,
+                        bool hasGrown) {
   // back animations
   int moveXval = lastCoords[0];
   int add = frame * 4;
@@ -141,21 +141,25 @@ void drawBackAnimations(int *secondToLastPos, int *lastCoords, int frame) {
   DrawText(std::to_string(secondToLastPos[0]).c_str(), 0, 36, 16, Color(WHITE));
   DrawText(std::to_string(diffValX).c_str(), 0, 54, 16, Color(WHITE));
 
-  if (diffValX < 0) {
-    moveXval += frame * 4;
-  }
-  if (diffValX > 0) {
-    moveXval -= frame * 4;
-  }
+  if (!hasGrown) {
+    if (diffValX < 0) {
+      moveXval += frame * 4;
+    }
+    if (diffValX > 0) {
+      moveXval -= frame * 4;
+    }
 
-  if (diffValY < 0) {
-    moveYval += frame * 4;
+    if (diffValY < 0) {
+      moveYval += frame * 4;
+    }
+    if (diffValY > 0) {
+      moveYval -= frame * 4;
+    }
+    DrawText(std::to_string(moveXval).c_str(), 0, 70, 16, Color(WHITE));
+    DrawRectangle(moveXval, moveYval, 20, 20, Color(WHITE));
+  } else {
+    DrawText("isGrowing", 500, 0, 20, Color(WHITE));
   }
-  if (diffValY > 0) {
-    moveYval -= frame * 4;
-  }
-  DrawText(std::to_string(moveXval).c_str(), 0, 70, 16, Color(WHITE));
-  DrawRectangle(moveXval, moveYval, 20, 20, Color(WHITE));
 }
 
 int main() {
@@ -164,7 +168,7 @@ int main() {
   std::map<int, int *> m;
   m[0] = new int[2]{250, 250};
 
-  int size = 4;
+  int size = 50;
   int count = 1;
 
   int lastKey = KEY_DOWN;
@@ -203,11 +207,15 @@ int main() {
         count++;
         timeCount = 0;
       } else {
-        hasBuf =
-            drawFrontAnimations(inputBuffer, arr[0], arr[1], timeCount, xspd,
-                                yspd, m, count, size, (size != m.size()));
+        if (shouldPlay) {
+          hasBuf = drawFrontAnimations(inputBuffer, arr[0], arr[1], timeCount,
+                                       xspd, yspd, m);
+        }
       }
-      drawBackAnimations(secondToLastCoords, m.begin()->second, timeCount);
+      if (shouldPlay) {
+        drawBackAnimations(secondToLastCoords, m.begin()->second, timeCount,
+                           (size != m.size()));
+      }
       DrawText(std::to_string(hasBuf).c_str(), 400, 0, 20, Color(WHITE));
       // loop to draw snakes
       std::map<int, int *>::iterator it;
