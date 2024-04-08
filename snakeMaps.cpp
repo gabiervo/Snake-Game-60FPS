@@ -67,6 +67,10 @@ void checkCollision(std::map<int, int *> *snakeHeadPos, int x, int y) {
       return;
     }
   }
+  if (x > 780 || x < 0 || y > 480 || y < 0) {
+    shouldPlay = false;
+    return;
+  }
 }
 
 int *snakeQueue(std::map<int, int *> *mp, int spdx, int spdy, int count,
@@ -134,9 +138,15 @@ void checkFoodCollision(std::pair<int, int> snakeHeadPos,
     if (snakeHeadPos.second == foodPos->second) {
       DrawText("isOn", 0, 100, 20, Color(WHITE));
       *snakeSize += 1;
+      (*foodPos).first = (rand() % 39 + 1) * 20;
+      (*foodPos).second = (rand() % 24 + 1) * 20;
     }
   } else {
     DrawText("isOff", 0, 100, 20, Color(WHITE));
+    DrawText(std::to_string((*foodPos).first).c_str(), 0, 120, 20,
+             Color(WHITE));
+    DrawText(std::to_string((*foodPos).second).c_str(), 0, 140, 20,
+             Color(WHITE));
   }
 }
 
