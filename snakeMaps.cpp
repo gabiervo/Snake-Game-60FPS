@@ -59,11 +59,12 @@ void executeInput(std::vector<int> *buffer, int *xspd, int *yspd) {
 
 bool shouldPlay = true;
 
-void checkCollision(std::map<int, int *> *mp, int x, int y) {
+void checkCollision(std::map<int, int *> *snakeHeadPos, int x, int y) {
   std::map<int, int *>::iterator it;
-  for (it = mp->begin(); it != mp->end(); ++it) {
+  for (it = snakeHeadPos->begin(); it != snakeHeadPos->end(); ++it) {
     if ((it->second)[0] == x && (it->second)[1] == y) {
       shouldPlay = false;
+      return;
     }
   }
 }
@@ -127,6 +128,18 @@ int drawFrontAnimations(std::vector<int> inputBuf, int x, int y, int frame,
   return val;
 }
 
+void checkFoodCollision(std::pair<int, int> snakeHeadPos,
+                        std::pair<int, int> *foodPos, int *snakeSize) {
+  if (snakeHeadPos.first == foodPos->first) {
+    if (snakeHeadPos.second == foodPos->second) {
+      DrawText("isOn", 0, 100, 20, Color(WHITE));
+      *snakeSize += 1;
+    }
+  } else {
+    DrawText("isOff", 0, 100, 20, Color(WHITE));
+  }
+}
+
 void drawBackAnimations(int *secondToLastPos, int *lastCoords, int frame,
                         bool hasGrown) {
   // back animations
@@ -166,14 +179,16 @@ int main() {
   InitWindow(SCR_W, SCR_H, "testWindow");
 
   std::map<int, int *> m;
-  m[0] = new int[2]{250, 250};
+  m[0] = new int[2]{240, 240};
 
-  int size = 50;
+  int size = 4;
   int count = 1;
 
   int lastKey = KEY_DOWN;
   int xspd;
   int yspd;
+
+  std::pair<int, int> foodPos = std::make_pair(240, 300);
 
   int timeCount = 0;
   int *arr;
@@ -204,6 +219,8 @@ int main() {
       if (timeCount >= 5 && shouldPlay) {
         executeInput(&inputBuffer, &xspd, &yspd);
         arr = snakeQueue(&m, xspd, yspd, count, size, (size != m.size()));
+        checkFoodCollision(std::make_pair(m[count][0], m[count][1]), &foodPos,
+                           &size);
         count++;
         timeCount = 0;
       } else {
@@ -230,6 +247,7 @@ int main() {
         }
         DrawRectangle((it->second)[0], (it->second)[1], 20, 20, Color(WHITE));
       }
+      DrawRectangle(foodPos.first, foodPos.second, 20, 20, Color(BLUE));
       EndDrawing();
     }
   }
