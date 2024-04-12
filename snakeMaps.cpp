@@ -191,7 +191,7 @@ int main() {
   std::map<int, int *> m;
   m[0] = new int[2]{240, 240};
 
-  int size = 4;
+  int size = 10;
   int count = 1;
 
   int lastKey = KEY_DOWN;
@@ -225,7 +225,10 @@ int main() {
       DrawText(std::to_string(arr[1]).c_str(), 300, 0, 20, Color(WHITE));
 
       checkKeys(&lastKey, &inputBuffer);
-
+      if (shouldPlay) {
+        drawBackAnimations(secondToLastCoords, m.begin()->second, timeCount,
+                           (size != m.size()));
+      }
       if (timeCount >= 5 && shouldPlay) {
         executeInput(&inputBuffer, &xspd, &yspd);
         arr = snakeQueue(&m, xspd, yspd, count, size, (size != m.size()));
@@ -239,16 +242,11 @@ int main() {
                                        xspd, yspd, m);
         }
       }
-      if (shouldPlay) {
-        drawBackAnimations(secondToLastCoords, m.begin()->second, timeCount,
-                           (size != m.size()));
-      }
       DrawText(std::to_string(hasBuf).c_str(), 400, 0, 20, Color(WHITE));
       // loop to draw snakes
       std::map<int, int *>::iterator it;
       it = m.begin();
       int countDrawnFrames = 0;
-
       for (it = ++it; it != m.end(); ++it) {
         countDrawnFrames++;
         if (countDrawnFrames == 1) {
