@@ -5,8 +5,11 @@
 #include <utility>
 #include <vector>
 
-#define SCR_W 800
+// remember that both SCR_W and SCR_H need to always be multiples of TILE_SIZE
+#define SCR_W 500
 #define SCR_H 500
+
+#define TILE_SIZE 20
 
 void checkKeys(int *k, std::vector<int> *inB) {
   if (IsKeyDown(KEY_RIGHT) && *k != KEY_LEFT) {
@@ -67,7 +70,7 @@ void checkCollision(std::map<int, int *> *snakeHeadPos, int x, int y) {
       return;
     }
   }
-  if (x > 780 || x < 0 || y > 480 || y < 0) {
+  if (x > SCR_W - TILE_SIZE || x < 0 || y > SCR_H - TILE_SIZE || y < 0) {
     shouldPlay = false;
     return;
   }
@@ -135,18 +138,21 @@ int drawFrontAnimations(std::vector<int> inputBuf, int x, int y, int frame,
 void checkFoodCollision(std::pair<int, int> snakeHeadPos,
                         std::pair<int, int> *foodPos, int *snakeSize) {
   if (snakeHeadPos.first == foodPos->first) {
+    // if collides change food position
     if (snakeHeadPos.second == foodPos->second) {
       DrawText("isOn", 0, 100, 20, Color(WHITE));
       *snakeSize += 1;
-      (*foodPos).first = (rand() % 39 + 1) * 20;
-      (*foodPos).second = (rand() % 24 + 1) * 20;
+
+      //-1 and +1 to prevent rand() from returning nums bigger than screen size
+      (*foodPos).first = (rand() % ((SCR_W / TILE_SIZE) - 1) + 1) * TILE_SIZE;
+      (*foodPos).second = (rand() % ((SCR_H / TILE_SIZE) - 1) + 1) * TILE_SIZE;
     }
   } else {
-    DrawText("isOff", 0, 100, 20, Color(WHITE));
-    DrawText(std::to_string((*foodPos).first).c_str(), 0, 120, 20,
-             Color(WHITE));
-    DrawText(std::to_string((*foodPos).second).c_str(), 0, 140, 20,
-             Color(WHITE));
+    // DrawText("isOff", 0, 100, 20, Color(WHITE));
+    // DrawText(std::to_string((*foodPos).first).c_str(), 0, 120, 20,
+    //        Color(WHITE));
+    // DrawText(std::to_string((*foodPos).second).c_str(), 0, 140, 20,
+    //      Color(WHITE));
   }
 }
 
@@ -189,7 +195,10 @@ int main() {
   InitWindow(SCR_W, SCR_H, "testWindow");
 
   std::map<int, int *> m;
-  m[0] = new int[2]{240, 240};
+
+  // remember to change initial snake position when changing screen size (if
+  // necessary)
+  m[0] = new int[2]{200, 240};
 
   int size = 10;
   int count = 1;
