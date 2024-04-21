@@ -7,7 +7,7 @@
 
 // remember that both SCR_W and SCR_H need to always be multiples of TILE_SIZE
 #define SCR_W 500
-#define SCR_H 500
+#define SCR_H 1000
 
 #define TILE_SIZE 20
 
@@ -100,9 +100,17 @@ int drawFrontAnimations(std::vector<int> inputBuf, int x, int y, int frame,
     switch (in) {
     case KEY_DOWN:
       DrawRectangle(x, y + (frame * 4), 20, 20, color);
+
+      // eyes
+      DrawRectangle(x + 2, y + (frame * 4) + 14, 5, 5, Color(BLUE));
+      DrawRectangle(x + 13, y + (frame * 4) + 14, 5, 5, Color(BLUE));
       break;
     case KEY_UP:
       DrawRectangle(x, y - (frame * 4), 20, 20, color);
+
+      // eyes
+      DrawRectangle(x + 2, y - (frame * 4) + 2, 5, 5, Color(BLUE));
+      DrawRectangle(x + 13, y - (frame * 4) + 2, 5, 5, Color(BLUE));
       break;
     case KEY_RIGHT:
       DrawRectangle(x + (frame * 4), y, 20, 20, color);
@@ -115,19 +123,32 @@ int drawFrontAnimations(std::vector<int> inputBuf, int x, int y, int frame,
   } else {
     int valX = 0;
     int valY = 0;
+    // if moving horizontally
     if (xspd != 0) {
       valX = frame * 4;
       if (xspd < 0) {
         valX -= valX * 2;
       }
       DrawRectangle(x + valX, y, 20, 20, color);
+      DrawRectangle(x + valX + (valX < 0) * 3 + (valX > 0) * 13, y + 2, 5, 5,
+                    Color(BLUE));
+      DrawRectangle(x + valX + (valX < 0) * 3 + (valX > 0) * 13, y + 13, 5, 5,
+                    Color(BLUE));
       val = 0;
+      // if moving vertically
     } else {
       int valY = frame * 4;
       if (yspd < 0) {
+        // going down
         valY -= valY * 2;
       }
       DrawRectangle(x, y + valY, 20, 20, color);
+
+      // eyes
+      DrawRectangle(x + 2, y + valY + (valY < 0) * 3 + (valY > 0) * 14, 5, 5,
+                    Color(BLUE));
+      DrawRectangle(x + 13, y + valY + (valY < 0) * 3 + (valY > 0) * 14, 5, 5,
+                    Color(BLUE));
       val = 1;
     }
   }
