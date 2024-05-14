@@ -1,7 +1,7 @@
 A simple snake game made with raylib in c++ that just has smooth snake movement with a very simple implementation using queues and interpolation.
 
-The GitHub already has a pre-compiled build for Mac under the snakeMaps file, but you can compile it yourself using the command below:
-**Note: remember to change the raylib directory listed in the #include statement to match your raylib file** 
+The GitHub already has a pre-compiled build for Mac under the snakeMaps file, but you can compile it yourself using the command below: <br>
+**Note: remember to change the raylib directory listed in the #include statement to match your raylib file** <br>
 **For g++:**
 ```
 g++ snakeMaps.cpp -o snakeMaps -lraylib -std=c++11
