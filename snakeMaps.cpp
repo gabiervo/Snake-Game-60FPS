@@ -8,7 +8,7 @@
 
 // remember that both SCR_W and SCR_H need to always be multiples of TILE_SIZE
 #define SCR_W 500
-#define SCR_H 1000
+#define SCR_H 800 
 
 #define TILE_SIZE 20
 
@@ -314,6 +314,9 @@ int main() {
       shouldPlay = false;
     }
     while (!WindowShouldClose()) {
+
+      DrawText(std::to_string(foodPos.first).c_str(), 0, 300, 16, Color(WHITE));
+      DrawText(std::to_string(foodPos.second).c_str(), 0, 320, 16, Color(WHITE));
 
       timeCount++;
       BeginDrawing();
